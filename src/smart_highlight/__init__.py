@@ -25,6 +25,7 @@
 import gedit
 import gtk
 from smart_highlight import SmartHighlightWindowHelper
+from config_ui import ConfigUI
 
 class SmartHighlightingPlugin(gedit.Plugin):
 	def __init__(self):
@@ -43,14 +44,13 @@ class SmartHighlightingPlugin(gedit.Plugin):
 	def update_ui(self, window):
 		self._instances[window].update_ui()
 
-	'''	
 	def is_configurable(self):
 		return True
 		
 	def create_configure_dialog(self):
 		dlg = ConfigUI(self)
 		return dlg.configWindow
-	#'''
+
 	def get_instance(self):
 		return self._instances[self._window]
 
