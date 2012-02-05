@@ -2,7 +2,7 @@
 
 
 # smart_highlight.py
-# v0.0.1
+# v0.0.3
 #
 # Copyright 2010 swatch
 #
@@ -41,7 +41,7 @@ class SmartHighlightWindowHelper:
 		self._window = window
 		self._plugin = plugin
 		#self.active_tab_changed_id = self._window.connect("active-tab-changed", self.active_tab_changed_action)
-		self.active_tab_changed_id = self._window.connect("tab-added", self.tab_added_action)
+		self.active_tab_added_id = self._window.connect("tab-added", self.tab_added_action)
 		
 		configfile = os.path.join(os.path.dirname(__file__), "config.xml")
 		self.config_manager = config_manager.ConfigManager(configfile)
@@ -55,7 +55,7 @@ class SmartHighlightWindowHelper:
 
 	def deactivate(self):
 		# Remove any installed menu items
-		self._window.disconnect(self.active_tab_changed_id)
+		self._window.disconnect(self.active_tab_added_id)
 		self.config_manager.update_config_file(self.config_manager.config_file, 'search_option', self.options)
 		self.config_manager.update_config_file(self.config_manager.config_file, 'smart_highlight', self.smart_highlight)
 	
@@ -77,6 +77,9 @@ class SmartHighlightWindowHelper:
 		
 		
 	def create_regex(self, pattern, options):
+		if options['REGEX_SEARCH'] == False:
+			pattern = re.escape(pattern)
+		
 		if options['MATCH_WHOLE_WORD'] == True:
 			pattern = "\\b%s\\b" % pattern
 			

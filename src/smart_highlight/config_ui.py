@@ -2,7 +2,7 @@
 
 
 # config_ui.py
-# v0.0.1
+# v0.0.3
 #
 # Copyright 2010 swatch
 #
@@ -54,11 +54,13 @@ class ConfigUI(object):
 		self.configWindow = UI.get_object("configWindow")
 		self.matchWholeWordCheckbutton = UI.get_object("matchWholeWordCheckbutton")
 		self.matchCaseCheckbutton = UI.get_object("matchCaseCheckbutton")
+		self.regexSearchCheckbutton = UI.get_object("regexSearchCheckbutton")
 		self.fgColorbutton = UI.get_object("fgColorbutton")
 		self.bgColorbutton = UI.get_object("bgColorbutton")
 		
 		self.matchWholeWordCheckbutton.set_active(self._instance.options['MATCH_WHOLE_WORD'])
 		self.matchCaseCheckbutton.set_active(self._instance.options['MATCH_CASE'])
+		self.regexSearchCheckbutton.set_active(self._instance.options['REGEX_SEARCH'])
 		self.fgColorbutton.set_color(gtk.gdk.color_parse(self._instance.smart_highlight['FOREGROUND_COLOR']))
 		self.bgColorbutton.set_color(gtk.gdk.color_parse(self._instance.smart_highlight['BACKGROUND_COLOR']))
 			
@@ -67,6 +69,7 @@ class ConfigUI(object):
 		signals = { "on_configWindow_destroy" : self.on_configWindow_destroy,
 					"on_matchWholeWordCheckbutton_toggled" : self.on_matchWholeWordCheckbutton_toggled,
 					"on_matchCaseCheckbutton_toggled" : self.on_matchCaseCheckbutton_toggled,
+					"on_regexSearchCheckbutton_toggled": self.on_regexSearchCheckbutton_toggled,
 					"on_fgColorbutton_color_set" : self.on_fgColorbutton_color_set,
 					"on_bgColorbutton_color_set" : self.on_bgColorbutton_color_set }
 		
@@ -81,6 +84,9 @@ class ConfigUI(object):
 		
 	def on_matchCaseCheckbutton_toggled(self, widget):
 		self._instance.options['MATCH_CASE'] = widget.get_active()
+	
+	def on_regexSearchCheckbutton_toggled(self, widget):
+		self._instance.options['REGEX_SEARCH'] = widget.get_active()
 		
 	def on_fgColorbutton_color_set(self, widget):
 		self._instance.smart_highlight['FOREGROUND_COLOR'] = widget.get_color().to_string()
