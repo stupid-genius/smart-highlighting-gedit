@@ -47,7 +47,6 @@ class SmartHighlightWindowHelper:
 	def __init__(self, plugin, window):
 		self._window = window
 		self._plugin = plugin
-		#self.active_tab_changed_id = self._window.connect("active-tab-changed", self.active_tab_changed_action)
 		self.active_tab_added_id = self._window.connect("tab-added", self.tab_added_action)
 		
 		configfile = os.path.join(os.path.dirname(__file__), "config.xml")
@@ -104,7 +103,7 @@ class SmartHighlightWindowHelper:
 		self.smart_highlight_off(doc)
 		start, end = doc.get_bounds()
 		text = unicode(doc.get_text(start, end), 'utf-8')
-		lines = re.findall('.*\\n', text + u'\n')
+		lines = text.splitlines(True)
 		
 		for i in range(len(lines)):
 			result = regex.findall(lines[i])
@@ -119,18 +118,29 @@ class SmartHighlightWindowHelper:
 					self.smart_highlight_on(doc, result_offset_start, result_len)
 					match_pos += match.end()
 		
-	#def active_tab_changed_action(self, action, tab):
 	def tab_added_action(self, action, tab):
 		doc = tab.get_document()
 		view = tab.get_view()
-		view.connect('button-release-event', self.on_textveiw_button_release_event, doc)
-		
+		#view.connect('button-release-event', self.on_textveiw_button_release_event, doc)
+		view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
+	
+	def on_textbuffer_markset_event(self, textbuffer, iter, textmark):
+		if textmark.get_name() == None:
+			return
+		if textbuffer.get_selection_bounds():
+			start, end = textbuffer.get_selection_bounds()
+ 			self.smart_highlighting_action(textbuffer, textbuffer.get_text(start, end))
+ 		else:
+ 			self.smart_highlight_off(textbuffer)
+	
+	'''
 	def on_textveiw_button_release_event(self, widget, event, doc):
 		if doc.get_has_selection():
 			start, end = doc.get_selection_bounds()
 			self.smart_highlighting_action(doc, doc.get_text(start, end))
 		else:
 			self.smart_highlight_off(doc)
+	#'''
 	
 	def smart_highlight_on(self, doc, highlight_start, highlight_len):
 		if doc.get_tag_table().lookup('smart_highlight') == None:
