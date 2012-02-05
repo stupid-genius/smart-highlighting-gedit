@@ -24,8 +24,7 @@
 
 
 
-import gtk
-import gedit
+from gi.repository import Gtk, Gedit
 import re
 import os.path
 #import pango
@@ -44,9 +43,8 @@ gettext.install(APP_NAME, LOCALE_DIR, unicode=True)
 
 
 class SmartHighlightWindowHelper:
-	def __init__(self, plugin, window):
+	def __init__(self, window):
 		self._window = window
-		self._plugin = plugin
 		views = self._window.get_views()
 		for view in views:
 			view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
@@ -55,11 +53,7 @@ class SmartHighlightWindowHelper:
 		configfile = os.path.join(os.path.dirname(__file__), "config.xml")
 		self.config_manager = config_manager.ConfigManager(configfile)
 		self.options = self.config_manager.load_configure('search_option')
-		for key in self.options.keys():
-			if self.options[key] == 'True':
-				self.options[key] = True
-			elif self.options[key] == 'False':
-				self.options[key] = False
+		self.config_manager.to_bool(self.options)
 		self.smart_highlight = self.config_manager.load_configure('smart_highlight')
 
 	def deactivate(self):
@@ -74,15 +68,16 @@ class SmartHighlightWindowHelper:
 	def update_ui(self):
 		pass
 
-		
+	'''		
 	def show_message_dialog(self, text):
-		dlg = gtk.MessageDialog(self._window, 
-								gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-								gtk.MESSAGE_INFO,
-								gtk.BUTTONS_CLOSE,
+		dlg = Gtk.MessageDialog(self._window, 
+								Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+								Gtk.MessageType.INFO,
+								Gtk.ButtonsType.CLOSE,
 								_(text))
 		dlg.run()
 		dlg.hide()
+	#'''
 		
 		
 	def create_regex(self, pattern, options):
@@ -105,7 +100,7 @@ class SmartHighlightWindowHelper:
 		regex = self.create_regex(search_pattern, self.options)
 		self.smart_highlight_off(doc)
 		start, end = doc.get_bounds()
-		text = unicode(doc.get_text(start, end), 'utf-8')
+		text = unicode(doc.get_text(start, end, True), 'utf-8')
 		
 		match = regex.search(text)
 		while(match):
@@ -121,7 +116,7 @@ class SmartHighlightWindowHelper:
 			return
 		if textbuffer.get_selection_bounds():
 			start, end = textbuffer.get_selection_bounds()
- 			self.smart_highlighting_action(textbuffer, textbuffer.get_text(start, end))
+ 			self.smart_highlighting_action(textbuffer, textbuffer.get_text(start, end, True))
  		else:
  			self.smart_highlight_off(textbuffer)
 	

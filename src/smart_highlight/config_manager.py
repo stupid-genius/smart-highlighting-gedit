@@ -3,7 +3,6 @@
 
 # config_manager.py
 #
-#
 # Copyright 2010 swatch
 #
 # This program is free software; you can redistribute it and/or modify
@@ -57,6 +56,13 @@ class ConfigManager:
 		f = open(filename, 'w+')
 		f.write(self.dom.toprettyxml('', '', 'utf-8'))
 		f.close
+		
+	def boolean(self, string):
+		return string.lower() in ['true', 'yes', 't', 'y', 'ok', '1']
+		
+	def to_bool(self, dic):
+		for key in dic.keys():
+			dic[key] = self.boolean(dic[key])
 
 	
 if __name__ == '__main__':

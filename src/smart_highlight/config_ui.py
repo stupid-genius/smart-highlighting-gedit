@@ -23,24 +23,12 @@
 
 
 
-
-
-import sys
-try:
-	import pygtk
-	pygtk.require("2.0")
-except:
-	pass
-try:
-	import gtk
-	import gtk.glade
-except:
-	sys.exit(1)
-	
+#import sys
+from gi.repository import Gtk, Gedit	
 import os.path
 
-#gtk.glade.bindtextdomain('smart-highlight', os.path.join(os.path.dirname(__file__), 'locale'))
-#gtk.glade.textdomain('smart-highlight')
+#Gtk.glade.bindtextdomain('smart-highlight', os.path.join(os.path.dirname(__file__), 'locale'))
+#Gtk.glade.textdomain('smart-highlight')
 
 
 class ConfigUI(object):
@@ -50,7 +38,7 @@ class ConfigUI(object):
 	
 		#Set the Glade file
 		gladefile = os.path.join(os.path.dirname(__file__),"config.glade")
-		UI = gtk.Builder()
+		UI = Gtk.Builder()
 		UI.set_translation_domain('smart-highlight')
 		UI.add_from_file(gladefile)
 		self.configWindow = UI.get_object("configWindow")
@@ -63,8 +51,8 @@ class ConfigUI(object):
 		self.matchWholeWordCheckbutton.set_active(self._instance.options['MATCH_WHOLE_WORD'])
 		self.matchCaseCheckbutton.set_active(self._instance.options['MATCH_CASE'])
 		self.regexSearchCheckbutton.set_active(self._instance.options['REGEX_SEARCH'])
-		self.fgColorbutton.set_color(gtk.gdk.color_parse(self._instance.smart_highlight['FOREGROUND_COLOR']))
-		self.bgColorbutton.set_color(gtk.gdk.color_parse(self._instance.smart_highlight['BACKGROUND_COLOR']))
+		self.fgColorbutton.set_color(Gtk.gdk.color_parse(self._instance.smart_highlight['FOREGROUND_COLOR']))
+		self.bgColorbutton.set_color(Gtk.gdk.color_parse(self._instance.smart_highlight['BACKGROUND_COLOR']))
 			
 		self.configWindow.show_all()
 
@@ -99,5 +87,5 @@ class ConfigUI(object):
 
 if __name__ == '__main__':
 	dlg = ConfigUI(None)
-	gtk.main()
+	Gtk.main()
 
