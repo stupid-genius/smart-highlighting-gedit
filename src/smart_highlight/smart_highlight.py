@@ -106,21 +106,12 @@ class SmartHighlightWindowHelper:
 		self.smart_highlight_off(doc)
 		start, end = doc.get_bounds()
 		text = unicode(doc.get_text(start, end), 'utf-8')
-		lines = text.splitlines(True)
 		
-		for i in range(len(lines)):
-			result = regex.findall(lines[i])
-			line_start = doc.get_iter_at_line(i)
-				
-			if result:
-				match_pos = 0
-				for cnt in range(0,len(result)):
-					match = regex.search(lines[i][match_pos:])
-					result_offset_start = line_start.get_offset() + match.start() + match_pos
-					result_len = len(match.group(0))
-					self.smart_highlight_on(doc, result_offset_start, result_len)
-					match_pos += match.end()
-		
+		match = regex.search(text)
+		while(match):
+			self.smart_highlight_on(doc, match.start(), match.end() - match.start())
+			match = regex.search(text, match.end())
+			
 	def tab_added_action(self, action, tab):
 		view = tab.get_view()
 		view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
