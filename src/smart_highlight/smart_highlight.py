@@ -30,6 +30,7 @@ import os.path
 #import pango
 
 import config_manager
+from config_ui import ConfigUI
 
 import gettext
 APP_NAME = 'smart-highlight'
@@ -40,11 +41,29 @@ LOCALE_DIR = '/usr/share/locale'
 gettext.install(APP_NAME, LOCALE_DIR, unicode=True)
 
 
+ui_str = """<ui>
+	<menubar name="MenuBar">
+		<menu name="ToolsMenu" action="Tools">
+			<placeholder name="ToolsOps_0">
+				<separator/>
+				<menu name="SmartHighlightMenu" action="SmartHighlightMenu">
+					<placeholder name="SmartHighlightMenuHolder">
+						<menuitem name="smart_highlight_configure" action="smart_highlight_configure"/>
+					</placeholder>
+				</menu>
+				<separator/>
+			</placeholder>
+		</menu>
+	</menubar>
+</ui>
+"""
+
 
 
 class SmartHighlightWindowHelper:
-	def __init__(self, window):
+	def __init__(self, plugin, window):
 		self._window = window
+		self._plugin = plugin
 		views = self._window.get_views()
 		for view in views:
 			view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
@@ -55,18 +74,45 @@ class SmartHighlightWindowHelper:
 		self.options = self.config_manager.load_configure('search_option')
 		self.config_manager.to_bool(self.options)
 		self.smart_highlight = self.config_manager.load_configure('smart_highlight')
+		
+		self._insert_menu()
 
 	def deactivate(self):
 		# Remove any installed menu items
 		self._window.disconnect(self.active_tab_added_id)
 		self.config_manager.update_config_file(self.config_manager.config_file, 'search_option', self.options)
 		self.config_manager.update_config_file(self.config_manager.config_file, 'smart_highlight', self.smart_highlight)
+		
+	def _insert_menu(self):
+		# Get the GtkUIManager
+		manager = self._window.get_ui_manager()
+
+		# Create a new action group
+		self._action_group = Gtk.ActionGroup("SmartHighlightActions")
+		self._action_group.add_actions( [("SmartHighlightMenu", None, _('Smart Highlighting'))] + \
+										[("smart_highlight_configure", None, _("Configure"), None, _("Smart Highlighting Configure"), self.smart_highlight_configure)]) 
+
+		# Insert the action group
+		manager.insert_action_group(self._action_group, -1)
+
+		# Merge the UI
+		self._ui_id = manager.add_ui_from_string(ui_str)
 	
 	def _remove_menu(self):
-		pass
+		# Get the GtkUIManager
+		manager = self._window.get_ui_manager()
+
+		# Remove the ui
+		manager.remove_ui(self._ui_id)
+
+		# Remove the action group
+		manager.remove_action_group(self._action_group)
+
+		# Make sure the manager updates
+		manager.ensure_update()
 
 	def update_ui(self):
-		pass
+		self._action_group.set_sensitive(self._window.get_active_document() != None)
 
 	'''		
 	def show_message_dialog(self, text):
@@ -130,5 +176,8 @@ class SmartHighlightWindowHelper:
 		if doc.get_tag_table().lookup('smart_highlight') == None:
 			tag = doc.create_tag("smart_highlight", foreground=self.smart_highlight['FOREGROUND_COLOR'], background=self.smart_highlight['BACKGROUND_COLOR'])
 		doc.remove_tag_by_name('smart_highlight', start, end)
+		
+	def smart_highlight_configure(self, window, tab, data=None):
+		config_ui = ConfigUI(self._plugin)
 	
 

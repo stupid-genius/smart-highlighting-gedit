@@ -24,7 +24,7 @@
 
 
 #import sys
-from gi.repository import Gtk, Gedit	
+from gi.repository import Gtk, Gedit, Gdk
 import os.path
 
 #Gtk.glade.bindtextdomain('smart-highlight', os.path.join(os.path.dirname(__file__), 'locale'))
@@ -33,8 +33,8 @@ import os.path
 
 class ConfigUI(object):
 	def __init__(self, plugin):
-		self._plugin = plugin
-		self._instance, self._window = self._plugin.get_instance()
+		#self._plugin = plugin
+		self._instance, self._window = plugin.get_instance()
 	
 		#Set the Glade file
 		gladefile = os.path.join(os.path.dirname(__file__),"config.glade")
@@ -51,8 +51,8 @@ class ConfigUI(object):
 		self.matchWholeWordCheckbutton.set_active(self._instance.options['MATCH_WHOLE_WORD'])
 		self.matchCaseCheckbutton.set_active(self._instance.options['MATCH_CASE'])
 		self.regexSearchCheckbutton.set_active(self._instance.options['REGEX_SEARCH'])
-		self.fgColorbutton.set_color(Gtk.gdk.color_parse(self._instance.smart_highlight['FOREGROUND_COLOR']))
-		self.bgColorbutton.set_color(Gtk.gdk.color_parse(self._instance.smart_highlight['BACKGROUND_COLOR']))
+		self.fgColorbutton.set_color(Gdk.color_parse(self._instance.smart_highlight['FOREGROUND_COLOR'])[1])
+		self.bgColorbutton.set_color(Gdk.color_parse(self._instance.smart_highlight['BACKGROUND_COLOR'])[1])
 			
 		self.configWindow.show_all()
 

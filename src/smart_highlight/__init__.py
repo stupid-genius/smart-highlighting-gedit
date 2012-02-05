@@ -38,7 +38,7 @@ class SmartHighlightingPlugin(GObject.Object, Gedit.WindowActivatable):
 		GObject.Object.__init__(self)
 
 	def do_activate(self):
-		self._plugin = SmartHighlightWindowHelper(self.window)
+		self._plugin = SmartHighlightWindowHelper(self, self.window)
 
 	def do_deactivate(self):
 		self._plugin.deactivate()
@@ -54,4 +54,7 @@ class SmartHighlightingPlugin(GObject.Object, Gedit.WindowActivatable):
 		widget = ConfigUI(self.window, self.config).configWindow
 		return widget
 	#'''
+	
+	def get_instance(self):
+		return self._plugin, self.window
 
