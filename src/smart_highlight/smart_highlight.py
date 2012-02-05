@@ -47,6 +47,9 @@ class SmartHighlightWindowHelper:
 	def __init__(self, plugin, window):
 		self._window = window
 		self._plugin = plugin
+		views = self._window.get_views()
+		for view in views:
+			view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
 		self.active_tab_added_id = self._window.connect("tab-added", self.tab_added_action)
 		
 		configfile = os.path.join(os.path.dirname(__file__), "config.xml")
@@ -119,9 +122,7 @@ class SmartHighlightWindowHelper:
 					match_pos += match.end()
 		
 	def tab_added_action(self, action, tab):
-		doc = tab.get_document()
 		view = tab.get_view()
-		#view.connect('button-release-event', self.on_textveiw_button_release_event, doc)
 		view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
 	
 	def on_textbuffer_markset_event(self, textbuffer, iter, textmark):
@@ -132,15 +133,6 @@ class SmartHighlightWindowHelper:
  			self.smart_highlighting_action(textbuffer, textbuffer.get_text(start, end))
  		else:
  			self.smart_highlight_off(textbuffer)
-	
-	'''
-	def on_textveiw_button_release_event(self, widget, event, doc):
-		if doc.get_has_selection():
-			start, end = doc.get_selection_bounds()
-			self.smart_highlighting_action(doc, doc.get_text(start, end))
-		else:
-			self.smart_highlight_off(doc)
-	#'''
 	
 	def smart_highlight_on(self, doc, highlight_start, highlight_len):
 		if doc.get_tag_table().lookup('smart_highlight') == None:

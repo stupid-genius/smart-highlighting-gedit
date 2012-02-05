@@ -35,13 +35,11 @@ class SmartHighlightingPlugin(gedit.Plugin):
 		self._instances = {}
 
 	def activate(self, window):
-		self._window = window
 		self._instances[window] = SmartHighlightWindowHelper(self, window)
 
 	def deactivate(self, window):
 		self._instances[window].deactivate()
 		del self._instances[window]
-		del self._window
 
 	def update_ui(self, window):
 		self._instances[window].update_ui()
@@ -54,5 +52,7 @@ class SmartHighlightingPlugin(gedit.Plugin):
 		return dlg.configWindow
 
 	def get_instance(self):
-		return self._instances[self._window]
+		window = gedit.app_get_default().get_active_window()
+		return self._instances[window], window
+
 
