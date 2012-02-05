@@ -51,8 +51,8 @@ class ConfigUI(object):
 		self.matchWholeWordCheckbutton.set_active(self._instance.options['MATCH_WHOLE_WORD'])
 		self.matchCaseCheckbutton.set_active(self._instance.options['MATCH_CASE'])
 		self.regexSearchCheckbutton.set_active(self._instance.options['REGEX_SEARCH'])
-		self.fgColorbutton.set_color(Gdk.color_parse(self._instance.smart_highlight['FOREGROUND_COLOR'])[1])
-		self.bgColorbutton.set_color(Gdk.color_parse(self._instance.smart_highlight['BACKGROUND_COLOR'])[1])
+		self.fgColorbutton.set_color(Gdk.color_parse(self._instance.smart_highlight['FOREGROUND_COLOR']))
+		self.bgColorbutton.set_color(Gdk.color_parse(self._instance.smart_highlight['BACKGROUND_COLOR']))
 			
 		self.configWindow.show_all()
 

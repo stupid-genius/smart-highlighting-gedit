@@ -34,11 +34,16 @@ from config_ui import ConfigUI
 
 import gettext
 APP_NAME = 'smart-highlight'
-LOCALE_DIR = '/usr/share/locale'
-#LOCALE_DIR = os.path.join(os.path.dirname(__file__), 'locale')
-#if not os.path.exists(LOCALE_DIR):
-#	LOCALE_DIR = '/usr/share/locale'
-gettext.install(APP_NAME, LOCALE_DIR, unicode=True)
+#LOCALE_DIR = '/usr/share/locale'
+LOCALE_DIR = os.path.join(os.path.dirname(__file__), 'locale')
+if not os.path.exists(LOCALE_DIR):
+	LOCALE_DIR = '/usr/share/locale'
+try:
+	t = gettext.translation(APP_NAME, LOCALE_DIR)
+	_ = t.gettext
+except:
+	pass
+#gettext.install(APP_NAME, LOCALE_DIR, unicode=True)
 
 
 ui_str = """<ui>
@@ -90,7 +95,7 @@ class SmartHighlightWindowHelper:
 		# Create a new action group
 		self._action_group = Gtk.ActionGroup("SmartHighlightActions")
 		self._action_group.add_actions( [("SmartHighlightMenu", None, _('Smart Highlighting'))] + \
-										[("smart_highlight_configure", None, _("Configure"), None, _("Smart Highlighting Configure"), self.smart_highlight_configure)]) 
+										[("smart_highlight_configure", None, _("Configuration"), None, _("Smart Highlighting Configure"), self.smart_highlight_configure)]) 
 
 		# Insert the action group
 		manager.insert_action_group(self._action_group, -1)
@@ -177,7 +182,7 @@ class SmartHighlightWindowHelper:
 			tag = doc.create_tag("smart_highlight", foreground=self.smart_highlight['FOREGROUND_COLOR'], background=self.smart_highlight['BACKGROUND_COLOR'])
 		doc.remove_tag_by_name('smart_highlight', start, end)
 		
-	def smart_highlight_configure(self, window, tab, data=None):
+	def smart_highlight_configure(self, action, data = None):
 		config_ui = ConfigUI(self._plugin)
 	
 
