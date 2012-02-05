@@ -87,17 +87,17 @@ class SmartHighlightWindowHelper:
 		
 	def create_regex(self, pattern, options):
 		if options['REGEX_SEARCH'] == False:
-			pattern = re.escape(unicode(pattern, "utf-8"))
+			pattern = re.escape(unicode(r'%s' % pattern, "utf-8"))
 		else:
-			pattern = unicode(pattern, "utf-8")
+			pattern = unicode(r'%s' % pattern, "utf-8")
 		
 		if options['MATCH_WHOLE_WORD'] == True:
-			pattern = "\\b%s\\b" % pattern
+			pattern = r'\b%s\b' % pattern
 			
 		if options['MATCH_CASE'] == True:
-			regex = re.compile(pattern)
+			regex = re.compile(pattern, re.MULTILINE)
 		else:
-			regex = re.compile(pattern, re.IGNORECASE)
+			regex = re.compile(pattern, re.IGNORECASE | re.MULTILINE)
 		
 		return regex
 
@@ -110,7 +110,7 @@ class SmartHighlightWindowHelper:
 		match = regex.search(text)
 		while(match):
 			self.smart_highlight_on(doc, match.start(), match.end() - match.start())
-			match = regex.search(text, match.end())
+			match = regex.search(text, match.end()+1)
 			
 	def tab_added_action(self, action, tab):
 		view = tab.get_view()
