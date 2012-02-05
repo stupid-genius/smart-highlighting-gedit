@@ -78,16 +78,18 @@ class SmartHighlightWindowHelper:
 		
 	def create_regex(self, pattern, options):
 		if options['REGEX_SEARCH'] == False:
-			pattern = re.escape(pattern)
+			pattern = re.escape(unicode(pattern, "utf-8"))
+		else:
+			pattern = unicode(pattern, "utf-8")
 		
 		if options['MATCH_WHOLE_WORD'] == True:
 			pattern = "\\b%s\\b" % pattern
 			
 		if options['MATCH_CASE'] == True:
-			regex = re.compile(unicode(pattern, "utf-8"))
+			regex = re.compile(pattern)
 		else:
-			regex = re.compile(unicode(pattern, "utf-8"), re.IGNORECASE)
-
+			regex = re.compile(pattern, re.IGNORECASE)
+		
 		return regex
 
 	def smart_highlighting_action(self, doc, search_pattern):
