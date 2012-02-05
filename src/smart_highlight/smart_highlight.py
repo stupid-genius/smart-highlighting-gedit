@@ -24,7 +24,7 @@
 
 
 
-from gi.repository import Gtk, Gedit
+from gi.repository import Gtk, Gdk, Gedit
 import re
 import os.path
 #import pango
@@ -72,6 +72,7 @@ class SmartHighlightWindowHelper:
 		views = self._window.get_views()
 		for view in views:
 			view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
+			view.connect('button-press-event', self.on_view_button_press_event)
 		self.active_tab_added_id = self._window.connect("tab-added", self.tab_added_action)
 		
 		configfile = os.path.join(os.path.dirname(__file__), "config.xml")
@@ -161,6 +162,7 @@ class SmartHighlightWindowHelper:
 	def tab_added_action(self, action, tab):
 		view = tab.get_view()
 		view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
+		#view.connect('button-press-event', self.on_view_button_press_event)
 	
 	def on_textbuffer_markset_event(self, textbuffer, iter, textmark):
 		if textmark.get_name() == None:
@@ -184,5 +186,34 @@ class SmartHighlightWindowHelper:
 		
 	def smart_highlight_configure(self, action, data = None):
 		config_ui = ConfigUI(self._plugin)
+
+	'''		
+ 	def auto_select_word_bounds(self, pattern=r'[_a-zA-Z][_a-zA-Z0-9]*'):
+		doc = self._window.get_active_document()
+		if doc.get_has_selection():
+			start, end = doc.get_selection_bounds()
+			return start, end
+		else:
+			current_iter = doc.get_iter_at_mark(doc.get_insert())
+			line_num = current_iter.get_line()
+			line_start = doc.get_iter_at_line(line_num)
+			line_text = doc.get_text(line_start, doc.get_iter_at_line(line_num + 1), True)
+			line_start_pos = line_start.get_offset()
+			matches = re.finditer(pattern, line_text)
+			for match in matches:
+				if current_iter.get_offset() in range(line_start_pos + match.start(), line_start_pos + match.end() + 1):
+					return doc.get_iter_at_offset(line_start_pos + match.start()), doc.get_iter_at_offset(line_start_pos+match.end())
+			return None
+	#'''
 	
+ 	'''
+ 	def on_view_button_press_event(self, object, event):
+		#if event.button == 1 and event.type == Gdk.EventType.BUTTON_PRESS:
+		if event.button == 1 and event.type == 5:	#EventType 2BUTTON_PRESS
+			print '2button press'
+			start, end = self.auto_select_word_bounds()
+			print self._window.get_active_document().get_text(start, end, True)
+			self._window.get_active_document().select_range(start, end)
+ 	#'''
+ 	
 
