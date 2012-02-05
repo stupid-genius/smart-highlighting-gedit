@@ -35,7 +35,7 @@ class SmartHighlightingPlugin(gedit.Plugin):
 		self._instances = {}
 
 	def activate(self, window):
-		self._instances[window] = SmartHighlightWindowHelper(self, window)
+		self._instances[window] = SmartHighlightWindowHelper(window)
 
 	def deactivate(self, window):
 		self._instances[window].deactivate()

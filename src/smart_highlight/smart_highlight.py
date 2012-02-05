@@ -44,9 +44,8 @@ gettext.install(APP_NAME, LOCALE_DIR, unicode=True)
 
 
 class SmartHighlightWindowHelper:
-	def __init__(self, plugin, window):
+	def __init__(self, window):
 		self._window = window
-		self._plugin = plugin
 		views = self._window.get_views()
 		for view in views:
 			view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
