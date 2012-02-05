@@ -2,7 +2,7 @@
 
 
 # smart_highlight.py
-# v0.0.3
+#
 #
 # Copyright 2010 swatch
 #
@@ -23,7 +23,6 @@
 
 
 
-from gettext import gettext as _
 
 import gtk
 import gedit
@@ -33,7 +32,15 @@ import os.path
 
 import config_manager
 
-#import lang
+import gettext
+APP_NAME = 'smart-highlight'
+LOCALE_DIR = '/usr/share/locale'
+#LOCALE_DIR = os.path.join(os.path.dirname(__file__), 'locale')
+#if not os.path.exists(LOCALE_DIR):
+#	LOCALE_DIR = '/usr/share/locale'
+gettext.install(APP_NAME, LOCALE_DIR, unicode=True)
+
+
 
 
 class SmartHighlightWindowHelper:

@@ -1,14 +1,21 @@
 #!/bin/sh
 
 
+PLUGIN_NAME="smart_highlight"
+
 # gedit plugin directory
-DEST=~/.gnome2/gedit/plugins/
+PLUGIN_DEST=~/.gnome2/gedit/plugins/
 
 # create it
-mkdir -p ${DEST}
+mkdir -p ${PLUGIN_DEST}
 
 # remove previous verision and currect version of plugin
-rm -rf ${DEST}/smart_highlight*
+rm -rf ${PLUGIN_DEST}/${PLUGIN_NAME}*
 
-# install currect verion of plugin
-cp -rv smart_highlight* ${DEST}
+# install current verion of plugin
+cp -rv ${PLUGIN_NAME}* ${PLUGIN_DEST}
+
+LOCALE_DEST=/usr/share/locale
+
+sudo cp -rv ${PLUGIN_NAME}/locale/* ${LOCALE_DEST}
+

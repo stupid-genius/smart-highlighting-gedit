@@ -2,7 +2,7 @@
 
 
 # config_ui.py
-# v0.0.3
+#
 #
 # Copyright 2010 swatch
 #
@@ -38,8 +38,9 @@ except:
 	sys.exit(1)
 	
 import os.path
-	
-from gettext import gettext as _
+
+#gtk.glade.bindtextdomain('smart-highlight', os.path.join(os.path.dirname(__file__), 'locale'))
+#gtk.glade.textdomain('smart-highlight')
 
 
 class ConfigUI(object):
@@ -50,6 +51,7 @@ class ConfigUI(object):
 		#Set the Glade file
 		gladefile = os.path.join(os.path.dirname(__file__),"config.glade")
 		UI = gtk.Builder()
+		UI.set_translation_domain('smart-highlight')
 		UI.add_from_file(gladefile)
 		self.configWindow = UI.get_object("configWindow")
 		self.matchWholeWordCheckbutton = UI.get_object("matchWholeWordCheckbutton")
