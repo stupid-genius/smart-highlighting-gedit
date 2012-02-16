@@ -74,8 +74,12 @@ class SmartHighlightWindowHelper:
 			view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
 			view.connect('button-press-event', self.on_view_button_press_event)
 		self.active_tab_added_id = self._window.connect("tab-added", self.tab_added_action)
-		
-		configfile = os.path.join(os.path.dirname(__file__), "config.xml")
+			
+		user_configfile = os.path.join(os.path.expanduser('~/.local/share/gedit/plugins/' + 'smart_highlight'), 'config.xml')
+		if os.path.exists(user_configfile):
+			configfile = user_configfile
+		else:	
+			configfile = os.path.join(os.path.dirname(__file__), "config.xml")
 		self.config_manager = config_manager.ConfigManager(configfile)
 		self.options = self.config_manager.load_configure('search_option')
 		self.config_manager.to_bool(self.options)
