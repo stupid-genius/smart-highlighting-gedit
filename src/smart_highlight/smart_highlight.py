@@ -28,12 +28,14 @@ from gi.repository import Gtk, Gdk, Gedit
 import re
 import os.path
 #import pango
+import shutil
 
 import config_manager
 from config_ui import ConfigUI
 
 import gettext
 APP_NAME = 'smart-highlight'
+CONFIG_DIR = os.path.expanduser('~/.local/share/gedit/plugins/' + APP_NAME + '/config')
 #LOCALE_DIR = '/usr/share/locale'
 LOCALE_DIR = os.path.join(os.path.dirname(__file__), 'locale')
 if not os.path.exists(LOCALE_DIR):
@@ -69,17 +71,30 @@ class SmartHighlightWindowHelper:
 	def __init__(self, plugin, window):
 		self._window = window
 		self._plugin = plugin
+		self.current_selection = ''
+		self.start_iter = None
+		self.end_iter = None
+		self.vadj_value = 0
 		views = self._window.get_views()
 		for view in views:
 			view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
-			view.connect('button-press-event', self.on_view_button_press_event)
+			view.get_vadjustment().connect('value-changed', self.on_view_vadjustment_value_changed)
+			#view.connect('button-press-event', self.on_view_button_press_event)
 		self.active_tab_added_id = self._window.connect("tab-added", self.tab_added_action)
-			
+
+		user_configfile = os.path.join(CONFIG_DIR, 'config.xml')
+		if not os.path.exists(user_configfile):
+			if not os.path.exists(os.path.dirname(user_configfile)):
+				os.makedirs(os.path.dirname(user_configfile))
+			shutil.copy2(os.path.dirname(__file__) + "/config/config.xml", os.path.dirname(user_configfile))
+		configfile = user_configfile
+		'''		
 		user_configfile = os.path.join(os.path.expanduser('~/.local/share/gedit/plugins/' + 'smart_highlight'), 'config.xml')
 		if os.path.exists(user_configfile):
 			configfile = user_configfile
 		else:	
 			configfile = os.path.join(os.path.dirname(__file__), "config.xml")
+		#'''
 		self.config_manager = config_manager.ConfigManager(configfile)
 		self.options = self.config_manager.load_configure('search_option')
 		self.config_manager.to_bool(self.options)
@@ -152,29 +167,47 @@ class SmartHighlightWindowHelper:
 		
 		return regex
 
-	def smart_highlighting_action(self, doc, search_pattern):
+	def smart_highlighting_action(self, doc, search_pattern, iter, clear_flg = True):
 		regex = self.create_regex(search_pattern, self.options)
-		self.smart_highlight_off(doc)
-		start, end = doc.get_bounds()
-		text = unicode(doc.get_text(start, end, True), 'utf-8')
+		if clear_flg == True:
+			self.smart_highlight_off(doc)
+		
+		current_line = iter.get_line()
+		start_line = current_line - 50
+		end_line = current_line + 50
+		if start_line <= 0:
+			self.start_iter = doc.get_start_iter()
+		else:
+			self.start_iter = doc.get_iter_at_line(start_line)
+		if end_line < doc.get_line_count():
+			self.end_iter = doc.get_iter_at_line(end_line)
+		else:
+			self.end_iter = doc.get_end_iter()
+			
+		text = unicode(doc.get_text(self.start_iter, self.end_iter, True), 'utf-8')
 		
 		match = regex.search(text)
 		while(match):
-			self.smart_highlight_on(doc, match.start(), match.end() - match.start())
+			self.smart_highlight_on(doc, match.start()+self.start_iter.get_offset(), match.end() - match.start())
 			match = regex.search(text, match.end()+1)
 			
 	def tab_added_action(self, action, tab):
 		view = tab.get_view()
 		view.get_buffer().connect('mark-set', self.on_textbuffer_markset_event)
+		view.get_vadjustment().connect('value-changed', self.on_view_vadjustment_value_changed)
 		#view.connect('button-press-event', self.on_view_button_press_event)
 	
 	def on_textbuffer_markset_event(self, textbuffer, iter, textmark):
-		if textmark.get_name() == None:
+		#print textmark.get_name()
+		self.vadj_value = self._window.get_active_view().get_vadjustment().get_value()
+		if textmark.get_name() != 'selection_bound' and textmark.get_name() != 'insert':
 			return
 		if textbuffer.get_selection_bounds():
 			start, end = textbuffer.get_selection_bounds()
- 			self.smart_highlighting_action(textbuffer, textbuffer.get_text(start, end, True))
+			self.current_selection = textbuffer.get_text(start, end, True)
+			self.smart_highlighting_action(textbuffer, self.current_selection, iter)
  		else:
+ 			self.current_selection = ''
  			self.smart_highlight_off(textbuffer)
 	
 	def smart_highlight_on(self, doc, highlight_start, highlight_len):
@@ -190,6 +223,16 @@ class SmartHighlightWindowHelper:
 		
 	def smart_highlight_configure(self, action, data = None):
 		config_ui = ConfigUI(self._plugin)
+		
+	def on_view_vadjustment_value_changed(self, object, data = None):
+		if self.current_selection == '':
+			return
+		if object.get_value < self.vadj_value:	#scroll up
+			self.smart_highlighting_action(self._window.get_active_document(), self.current_selection, self.start_iter, False)
+		else:	#scroll down
+			self.smart_highlighting_action(self._window.get_active_document(), self.current_selection, self.end_iter, False)
+
+			
 
 	'''		
  	def auto_select_word_bounds(self, pattern=r'[_a-zA-Z][_a-zA-Z0-9]*'):
