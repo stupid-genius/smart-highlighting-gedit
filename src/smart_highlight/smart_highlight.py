@@ -28,12 +28,14 @@ from gi.repository import Gtk, Gdk, Gedit
 import re
 import os.path
 #import pango
+import shutil
 
 import config_manager
 from config_ui import ConfigUI
 
 import gettext
 APP_NAME = 'smart-highlight'
+CONFIG_DIR = os.path.expanduser('~/.local/share/gedit/plugins/' + APP_NAME + '/config')
 #LOCALE_DIR = '/usr/share/locale'
 LOCALE_DIR = os.path.join(os.path.dirname(__file__), 'locale')
 if not os.path.exists(LOCALE_DIR):
@@ -79,12 +81,20 @@ class SmartHighlightWindowHelper:
 			view.get_vadjustment().connect('value-changed', self.on_view_vadjustment_value_changed)
 			#view.connect('button-press-event', self.on_view_button_press_event)
 		self.active_tab_added_id = self._window.connect("tab-added", self.tab_added_action)
-			
+
+		user_configfile = os.path.join(CONFIG_DIR, 'config.xml')
+		if not os.path.exists(user_configfile):
+			if not os.path.exists(os.path.dirname(user_configfile)):
+				os.makedirs(os.path.dirname(user_configfile))
+			shutil.copy2(os.path.dirname(__file__) + "/config/config.xml", os.path.dirname(user_configfile))
+		configfile = user_configfile
+		'''		
 		user_configfile = os.path.join(os.path.expanduser('~/.local/share/gedit/plugins/' + 'smart_highlight'), 'config.xml')
 		if os.path.exists(user_configfile):
 			configfile = user_configfile
 		else:	
 			configfile = os.path.join(os.path.dirname(__file__), "config.xml")
+		#'''
 		self.config_manager = config_manager.ConfigManager(configfile)
 		self.options = self.config_manager.load_configure('search_option')
 		self.config_manager.to_bool(self.options)
@@ -215,7 +225,6 @@ class SmartHighlightWindowHelper:
 		config_ui = ConfigUI(self._plugin)
 		
 	def on_view_vadjustment_value_changed(self, object, data = None):
-		print self.current_selection
 		if self.current_selection == '':
 			return
 		if object.get_value < self.vadj_value:	#scroll up
