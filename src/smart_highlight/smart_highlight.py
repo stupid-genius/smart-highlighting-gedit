@@ -172,6 +172,7 @@ class SmartHighlightWindowHelper:
 		if clear_flg == True:
 			self.smart_highlight_off(doc)
 		
+		self.vadj_value = self._window.get_active_view().get_vadjustment().get_value()
 		current_line = iter.get_line()
 		start_line = current_line - 50
 		end_line = current_line + 50
@@ -199,7 +200,6 @@ class SmartHighlightWindowHelper:
 	
 	def on_textbuffer_markset_event(self, textbuffer, iter, textmark):
 		#print textmark.get_name()
-		self.vadj_value = self._window.get_active_view().get_vadjustment().get_value()
 		if textmark.get_name() != 'selection_bound' and textmark.get_name() != 'insert':
 			return
 		if textbuffer.get_selection_bounds():
@@ -227,7 +227,7 @@ class SmartHighlightWindowHelper:
 	def on_view_vadjustment_value_changed(self, object, data = None):
 		if self.current_selection == '':
 			return
-		if object.get_value < self.vadj_value:	#scroll up
+		if object.get_value() < self.vadj_value:	#scroll up
 			self.smart_highlighting_action(self._window.get_active_document(), self.current_selection, self.start_iter, False)
 		else:	#scroll down
 			self.smart_highlighting_action(self._window.get_active_document(), self.current_selection, self.end_iter, False)
