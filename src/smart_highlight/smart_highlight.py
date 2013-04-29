@@ -30,8 +30,8 @@ import os.path
 #import pango
 import shutil
 
-import config_manager
-from config_ui import ConfigUI
+from . import config_manager
+from .config_ui import ConfigUI
 
 import gettext
 APP_NAME = 'smart-highlight'
@@ -153,9 +153,9 @@ class SmartHighlightWindowHelper:
 		
 	def create_regex(self, pattern, options):
 		if options['REGEX_SEARCH'] == False:
-			pattern = re.escape(unicode(r'%s' % pattern, "utf-8"))
+			pattern = re.escape(str(r'%s' % pattern))
 		else:
-			pattern = unicode(r'%s' % pattern, "utf-8")
+			pattern = str(r'%s' % pattern)
 		
 		if options['MATCH_WHOLE_WORD'] == True:
 			pattern = r'\b%s\b' % pattern
@@ -185,7 +185,7 @@ class SmartHighlightWindowHelper:
 		else:
 			self.end_iter = doc.get_end_iter()
 			
-		text = unicode(doc.get_text(self.start_iter, self.end_iter, True), 'utf-8')
+		text = str(doc.get_text(self.start_iter, self.end_iter, True))
 		
 		match = regex.search(text)
 		while(match):
@@ -206,7 +206,7 @@ class SmartHighlightWindowHelper:
 			start, end = textbuffer.get_selection_bounds()
 			self.current_selection = textbuffer.get_text(start, end, True)
 			self.smart_highlighting_action(textbuffer, self.current_selection, iter)
- 		else:
+		else:
  			self.current_selection = ''
  			self.smart_highlight_off(textbuffer)
 	
@@ -235,7 +235,7 @@ class SmartHighlightWindowHelper:
 			
 
 	'''		
- 	def auto_select_word_bounds(self, pattern=r'[_a-zA-Z][_a-zA-Z0-9]*'):
+	def auto_select_word_bounds(self, pattern=r'[_a-zA-Z][_a-zA-Z0-9]*'):
 		doc = self._window.get_active_document()
 		if doc.get_has_selection():
 			start, end = doc.get_selection_bounds()
@@ -251,10 +251,8 @@ class SmartHighlightWindowHelper:
 				if current_iter.get_offset() in range(line_start_pos + match.start(), line_start_pos + match.end() + 1):
 					return doc.get_iter_at_offset(line_start_pos + match.start()), doc.get_iter_at_offset(line_start_pos+match.end())
 			return None
-	#'''
 	
- 	'''
- 	def on_view_button_press_event(self, object, event):
+	def on_view_button_press_event(self, object, event):
 		#if event.button == 1 and event.type == Gdk.EventType.BUTTON_PRESS:
 		if event.button == 1 and event.type == 5:	#EventType 2BUTTON_PRESS
 			print '2button press'
