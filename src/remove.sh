@@ -3,7 +3,7 @@
 
 # plugin name
 PLUGIN_NAME="smart_highlight"
-APP_NAME="smart-highlight"
+APP_NAME="smart_highlight"
 # plugin install path for all user
 PLUGIN_PATH_ALL=/usr/lib/gedit/plugins/
 # plugin install path for current user

@@ -34,16 +34,20 @@ from . import config_manager
 from .config_ui import ConfigUI
 
 import gettext
-APP_NAME = 'smart-highlight'
+APP_NAME = 'smart_highlight'		#Same as module name defined at .plugin file.
 CONFIG_DIR = os.path.expanduser('~/.local/share/gedit/plugins/' + APP_NAME + '/config')
 #LOCALE_DIR = '/usr/share/locale'
 LOCALE_DIR = os.path.join(os.path.dirname(__file__), 'locale')
+print(LOCALE_DIR)
 if not os.path.exists(LOCALE_DIR):
 	LOCALE_DIR = '/usr/share/locale'
+	print('locale')
 try:
 	t = gettext.translation(APP_NAME, LOCALE_DIR)
 	_ = t.gettext
+	print('gettext')
 except:
+	print('none')
 	pass
 #gettext.install(APP_NAME, LOCALE_DIR, unicode=True)
 
