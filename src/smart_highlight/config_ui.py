@@ -27,6 +27,8 @@
 from gi.repository import Gtk, Gedit, Gdk
 import os.path
 
+APP_NAME = 'smart_highlight'
+
 #Gtk.glade.bindtextdomain('smart-highlight', os.path.join(os.path.dirname(__file__), 'locale'))
 #Gtk.glade.textdomain('smart-highlight')
 
@@ -39,7 +41,7 @@ class ConfigUI(object):
 		#Set the Glade file
 		gladefile = os.path.join(os.path.dirname(__file__),"config.glade")
 		UI = Gtk.Builder()
-		UI.set_translation_domain('smart_highlight')
+		UI.set_translation_domain(APP_NAME)
 		UI.add_from_file(gladefile)
 		self.configWindow = UI.get_object("configWindow")
 		self.matchWholeWordCheckbutton = UI.get_object("matchWholeWordCheckbutton")
